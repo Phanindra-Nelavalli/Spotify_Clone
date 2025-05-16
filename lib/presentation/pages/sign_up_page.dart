@@ -5,8 +5,12 @@ import 'package:spotify/common/widgets/basic_app_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:spotify/common/widgets/basic_app_button.dart';
 import 'package:spotify/core/configs/assets/app_vectors.dart';
+import 'package:spotify/data/models/auth/create_user_req.dart';
+import 'package:spotify/domain/usecases/signup.dart';
+import 'package:spotify/presentation/pages/root_page.dart';
 
 import 'package:spotify/presentation/pages/sign_in_page.dart';
+import 'package:spotify/service_locator.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -17,7 +21,9 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   bool showPassword = false;
-
+  final TextEditingController _fullName = TextEditingController();
+  final TextEditingController _email = TextEditingController();
+  final TextEditingController _password = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,7 +45,43 @@ class _SignUpPageState extends State<SignUpPage> {
               SizedBox(height: 20),
               _passwordField(context),
               SizedBox(height: 50),
-              BasicAppButton(onPressed: () {}, title: "Create Account"),
+              BasicAppButton(
+                onPressed: () async {
+                  var result = await sl<SignUpUseCase>().call(
+                    params: CreateUserReq(
+                      fullName: _fullName.text.toString(),
+                      email: _email.text.toString(),
+                      password: _password.text.toString(),
+                    ),
+                  );
+                  result.fold(
+                    (l) {
+                      var snackBar = SnackBar(
+                        content: Text(
+                          l,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        backgroundColor: Colors.red,
+                      );
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    },
+                    (r) {
+                      Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (BuildContext context) => RootPage(),
+                        ),
+                        (root) => false,
+                      );
+                    },
+                  );
+                },
+                title: "Create Account",
+              ),
               SizedBox(height: 35),
               _dividerrOr(),
               SizedBox(height: 30),
@@ -61,6 +103,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Widget _fullNameField(BuildContext context) {
     return TextField(
+      controller: _fullName,
       decoration: InputDecoration(
         hintText: "Full Name",
       ).applyDefaults(Theme.of(context).inputDecorationTheme),
@@ -69,6 +112,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Widget _emailField(BuildContext context) {
     return TextField(
+      controller: _email,
       decoration: InputDecoration(
         hintText: "Enter Email",
       ).applyDefaults(Theme.of(context).inputDecorationTheme),
@@ -77,6 +121,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Widget _passwordField(BuildContext context) {
     return TextField(
+      controller: _password,
       obscureText: !showPassword,
       decoration: InputDecoration(
         hintText: "Password",
