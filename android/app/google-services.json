@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "158681002300",
+    "project_id": "zinc-primer-455711-p7",
+    "storage_bucket": "zinc-primer-455711-p7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:158681002300:android:fb9307239b7e343aefee39",
+        "android_client_info": {
+          "package_name": "com.example.spotify"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyArXuulA43U6x1AZdKAFyop3B0WpbjPZn4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
