@@ -6,7 +6,7 @@ import 'package:spotify/common/widgets/basic_app_button.dart';
 import 'package:spotify/core/configs/assets/app_vectors.dart';
 import 'package:spotify/data/models/auth/signin_user_req.dart';
 import 'package:spotify/domain/usecases/signin.dart';
-import 'package:spotify/presentation/pages/root_page.dart';
+import 'package:spotify/presentation/pages/home_page.dart';
 import 'package:spotify/presentation/pages/sign_up_page.dart';
 import 'package:spotify/service_locator.dart';
 
@@ -67,7 +67,7 @@ class _SignInPageState extends State<SignInPage> {
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (BuildContext context) => RootPage(),
+                          builder: (BuildContext context) => HomePage(),
                         ),
                         (root) => false,
                       );
