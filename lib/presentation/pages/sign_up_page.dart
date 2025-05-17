@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:spotify/common/helpers/is_dark_mode.dart';
 import 'package:spotify/common/widgets/basic_app_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -7,8 +6,7 @@ import 'package:spotify/common/widgets/basic_app_button.dart';
 import 'package:spotify/core/configs/assets/app_vectors.dart';
 import 'package:spotify/data/models/auth/create_user_req.dart';
 import 'package:spotify/domain/usecases/signup.dart';
-import 'package:spotify/presentation/pages/root_page.dart';
-
+import 'package:spotify/presentation/pages/home_page.dart';
 import 'package:spotify/presentation/pages/sign_in_page.dart';
 import 'package:spotify/service_locator.dart';
 
@@ -73,7 +71,7 @@ class _SignUpPageState extends State<SignUpPage> {
                       Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(
-                          builder: (BuildContext context) => RootPage(),
+                          builder: (BuildContext context) => HomePage(),
                         ),
                         (root) => false,
                       );
