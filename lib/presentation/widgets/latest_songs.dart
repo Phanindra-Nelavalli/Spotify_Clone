@@ -79,7 +79,7 @@ class LatestSongs extends StatelessWidget {
             ),
             SizedBox(height: 5),
             Text(
-              song.title,
+              song.artist,
               style: TextStyle(fontWeight: FontWeight.w400, fontSize: 12),
             ),
           ],

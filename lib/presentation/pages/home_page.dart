@@ -7,6 +7,7 @@ import 'package:spotify/core/configs/assets/app_images.dart';
 import 'package:spotify/core/configs/assets/app_vectors.dart';
 import 'package:spotify/core/configs/theme/app_colors.dart';
 import 'package:spotify/presentation/widgets/latest_songs.dart';
+import 'package:spotify/presentation/widgets/play_list.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -20,7 +21,6 @@ class _HomePageState extends State<HomePage>
   late TabController _tabController;
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _tabController = TabController(length: 4, vsync: this);
   }
@@ -32,26 +32,30 @@ class _HomePageState extends State<HomePage>
         title: SvgPicture.asset(AppVectors.logo, height: 35, width: 35),
         hideBack: true,
       ),
-      body: Column(
-        children: [
-          _homeTopCard(),
-          _tabBar(),
-          SizedBox(
-            height: 195,
-            child: TabBarView(
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(left: 25),
-                  child: LatestSongs(),
-                ),
-                Container(),
-                Container(),
-                Container(),
-              ],
-              controller: _tabController,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            _homeTopCard(),
+            _tabBar(),
+            SizedBox(
+              height: 195,
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  Padding(
+                    padding: EdgeInsets.only(left: 25),
+                    child: LatestSongs(),
+                  ),
+                  Container(),
+                  Container(),
+                  Container(),
+                ],
+              ),
             ),
-          ),
-        ],
+            SizedBox(height: 40),
+            PlayList(),
+          ],
+        ),
       ),
     );
   }
