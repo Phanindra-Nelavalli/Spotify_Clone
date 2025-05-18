@@ -74,7 +74,7 @@ class _SignInPageState extends State<SignInPage> {
                     },
                   );
                 },
-                title: "Create Account",
+                title: "Login",
               ),
               SizedBox(height: 40),
               _dividerrOr(),
