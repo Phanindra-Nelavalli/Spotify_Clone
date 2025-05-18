@@ -6,6 +6,7 @@ import 'package:spotify/data/sources/song/song_firebase_service.dart';
 import 'package:spotify/domain/repository/auth/auth_repository.dart';
 import 'package:spotify/domain/repository/song/song_repository.dart';
 import 'package:spotify/domain/usecases/get_Latest_Song.dart';
+import 'package:spotify/domain/usecases/get_play_List.dart';
 import 'package:spotify/domain/usecases/signin.dart';
 import 'package:spotify/domain/usecases/signup.dart';
 
@@ -17,8 +18,9 @@ Future<void> initializeDependencies() async {
 
   sl.registerSingleton<AuthRepository>(AuthRepositoryImp());
   sl.registerSingleton<SongRepository>(SongRepositoryImp());
-  
+
   sl.registerSingleton<SignUpUseCase>(SignUpUseCase());
   sl.registerSingleton<SignInUseCase>(SignInUseCase());
   sl.registerSingleton<GetLatestSongUseCse>(GetLatestSongUseCse());
+  sl.registerSingleton<GetPlayListUseCase>(GetPlayListUseCase());
 }

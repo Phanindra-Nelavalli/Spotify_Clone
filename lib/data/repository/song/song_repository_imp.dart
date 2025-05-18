@@ -8,4 +8,9 @@ class SongRepositoryImp extends SongRepository {
   Future<Either> getLatestSongs() async{
     return await sl<SongFirebaseService>().getLatestSongs();
   }
+  
+  @override
+  Future<Either> getPlayList() async {
+    return await sl<SongFirebaseService>().getPlayList();
+  }
 }
