@@ -94,7 +94,7 @@ class SongPlayerPage extends StatelessWidget {
   }
 
   Widget _songPlayer() {
-    return BlocBuilder<SongPlayerCubit,SongPlayerState>(
+    return BlocBuilder<SongPlayerCubit, SongPlayerState>(
       builder: (context, state) {
         if (state is SongPlayerLoaded) {
           return Column(
@@ -114,7 +114,52 @@ class SongPlayerPage extends StatelessWidget {
                         .songDuration
                         .inSeconds
                         .toDouble(),
-                onChanged: (value) {},
+                onChanged: (value) {
+                  context.read<SongPlayerCubit>().updateSeekPosition(
+                    Duration(seconds: value.toInt()),
+                  );
+                },
+                onChangeEnd: (value) {
+                  context.read<SongPlayerCubit>().seekTo(
+                    Duration(seconds: value.toInt()),
+                  );
+                },
+              ),
+
+              SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    formatDuration(
+                      context.read<SongPlayerCubit>().songPosition,
+                    ),
+                  ),
+                  Text(
+                    formatDuration(
+                      context.read<SongPlayerCubit>().songDuration,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 20),
+              GestureDetector(
+                onTap: () {
+                  context.read<SongPlayerCubit>().playOrPause();
+                },
+                child: Container(
+                  height: 60,
+                  width: 60,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.primary,
+                  ),
+                  child: Icon(
+                    context.read<SongPlayerCubit>().audioPlayer.playing
+                        ? Icons.pause
+                        : Icons.play_arrow_rounded,
+                  ),
+                ),
               ),
             ],
           );
@@ -125,5 +170,11 @@ class SongPlayerPage extends StatelessWidget {
         );
       },
     );
+  }
+
+  String formatDuration(Duration duration) {
+    final minutes = duration.inMinutes.remainder(60);
+    final seconds = duration.inSeconds.remainder(60);
+    return "${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}";
   }
 }
