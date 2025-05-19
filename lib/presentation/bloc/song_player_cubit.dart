@@ -23,6 +23,16 @@ class SongPlayerCubit extends Cubit<SongPlayerState> {
     emit(SongPlayerLoaded());
   }
 
+  void seekTo(Duration position) {
+    audioPlayer.seek(position);
+    emit(SongPlayerLoaded());
+  }
+
+  void updateSeekPosition(Duration position) {
+    songPosition = position;
+    emit(SongPlayerLoaded());
+  }
+
   Future<void> loadSong(String url) async {
     try {
       await audioPlayer.setUrl(url);
