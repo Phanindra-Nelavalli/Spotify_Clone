@@ -6,6 +6,7 @@ import 'package:spotify/common/widgets/basic_app_bar.dart';
 import 'package:spotify/core/configs/assets/app_images.dart';
 import 'package:spotify/core/configs/assets/app_vectors.dart';
 import 'package:spotify/core/configs/theme/app_colors.dart';
+import 'package:spotify/presentation/pages/profile_page.dart';
 import 'package:spotify/presentation/widgets/latest_songs.dart';
 import 'package:spotify/presentation/widgets/play_list.dart';
 
@@ -31,6 +32,17 @@ class _HomePageState extends State<HomePage>
       appBar: BasicAppBar(
         title: SvgPicture.asset(AppVectors.logo, height: 35, width: 35),
         hideBack: true,
+        action: IconButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (BuildContext context) => ProfilePage(),
+              ),
+            );
+          },
+          icon: Icon(Icons.person),
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
