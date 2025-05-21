@@ -8,6 +8,7 @@ import 'package:spotify/domain/repository/song/song_repository.dart';
 import 'package:spotify/domain/usecases/add_or_remove_favourite_song.dart';
 import 'package:spotify/domain/usecases/get_Latest_Song.dart';
 import 'package:spotify/domain/usecases/get_play_List.dart';
+import 'package:spotify/domain/usecases/get_user.dart';
 import 'package:spotify/domain/usecases/is_favorite_song.dart';
 import 'package:spotify/domain/usecases/signin.dart';
 import 'package:spotify/domain/usecases/signup.dart';
@@ -29,4 +30,5 @@ Future<void> initializeDependencies() async {
   sl.registerSingleton<AddOrRemoveFavouriteSongUseCase>(
     AddOrRemoveFavouriteSongUseCase(),
   );
+  sl.registerSingleton<GetUserUseCase>(GetUserUseCase());
 }
