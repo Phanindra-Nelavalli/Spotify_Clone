@@ -9,11 +9,13 @@ import 'package:spotify/domain/entities/song/song.dart';
 class FavouriteButton extends StatelessWidget {
   final SongEntity songEntity;
   final double size;
+  final Function? function;
 
   const FavouriteButton({
     super.key,
     required this.songEntity,
     required this.size,
+    this.function,
   });
 
   @override
@@ -39,8 +41,11 @@ class FavouriteButton extends StatelessWidget {
         }
 
         return IconButton(
-          onPressed: () {
+          onPressed: () async{
             favouriteButtonCubit.favouriteButtonUpdated(songEntity.songId);
+            if (function != null) {
+              function!();
+            }
           },
           icon: Icon(
             isFavourite
