@@ -97,6 +97,7 @@ class SongFirebaseServiceImp extends SongFirebaseService {
   }
 
   @override
+  @override
   Future<bool> isFavouriteSong(String songId) async {
     try {
       String userId = auth.currentUser!.uid;
@@ -107,11 +108,8 @@ class SongFirebaseServiceImp extends SongFirebaseService {
               .collection('Favourites')
               .where('songId', isEqualTo: songId)
               .get();
-      if (favouriteSongs.docs.isNotEmpty) {
-        return false;
-      } else {
-        return true;
-      }
+
+      return favouriteSongs.docs.isNotEmpty;
     } catch (e) {
       return false;
     }

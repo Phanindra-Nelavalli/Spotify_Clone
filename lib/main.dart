@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:hydrated_bloc/hydrated_bloc.dart';
+import 'package:spotify/common/bloc/favourite_button_cubit.dart';
 import 'package:spotify/core/configs/theme/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:spotify/firebase_options.dart';
@@ -29,7 +30,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
-      providers: [BlocProvider(create: (_) => ThemeCubit())],
+      providers: [
+        BlocProvider(create: (_) => ThemeCubit()),
+        BlocProvider<FavouriteButtonCubit>(
+          create: (context) => FavouriteButtonCubit(),
+        ),
+      ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder:
             (context, mode) => MaterialApp(
