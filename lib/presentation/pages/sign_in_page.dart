@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:spotify/common/helpers/is_dark_mode.dart';
 import 'package:spotify/common/widgets/basic_app_bar.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:spotify/common/widgets/basic_app_button.dart';
@@ -76,10 +75,6 @@ class _SignInPageState extends State<SignInPage> {
                 },
                 title: "Login",
               ),
-              SizedBox(height: 40),
-              _dividerrOr(),
-              SizedBox(height: 35),
-              _googleOrApple(),
             ],
           ),
         ),
@@ -125,33 +120,6 @@ class _SignInPageState extends State<SignInPage> {
     );
   }
 
-  Widget _dividerrOr() {
-    return Row(
-      children: [
-        Expanded(child: Divider()),
-        SizedBox(width: 10),
-        Text("OR"),
-        SizedBox(width: 10),
-        Expanded(child: Divider()),
-      ],
-    );
-  }
-
-  Widget _googleOrApple() {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 30),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SvgPicture.asset(AppVectors.google, height: 40, width: 40),
-          SizedBox(width: 58),
-          SvgPicture.asset(
-            context.isDarkMode ? AppVectors.appleDark : AppVectors.appleLight,
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _registerText(BuildContext context) {
     return Padding(
