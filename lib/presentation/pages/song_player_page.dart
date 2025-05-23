@@ -8,10 +8,19 @@ import 'package:spotify/core/configs/theme/app_colors.dart';
 import 'package:spotify/domain/entities/song/song.dart';
 import 'package:spotify/presentation/bloc/song_player_cubit.dart';
 import 'package:spotify/presentation/bloc/song_player_state.dart';
+import 'package:just_audio/just_audio.dart';
 
 class SongPlayerPage extends StatelessWidget {
   final SongEntity song;
-  const SongPlayerPage({super.key, required this.song});
+  final List<SongEntity>? playlist;
+  final int? initialIndex;
+
+  const SongPlayerPage({
+    super.key,
+    required this.song,
+    this.playlist,
+    this.initialIndex,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,17 +40,26 @@ class SongPlayerPage extends StatelessWidget {
             (_) =>
                 SongPlayerCubit()..loadSong(
                   "${AppUrls.songFirestorage}${Uri.encodeComponent('${song.artist} - ${song.title}.mp3')}?${AppUrls.mediaAlt}",
+                  songPlaylist: playlist,
+                  initialIndex: initialIndex,
                 ),
         child: SingleChildScrollView(
           padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-          child: Column(
-            children: [
-              _songCover(song, context),
-              SizedBox(height: 17),
-              _songDetails(song),
-              SizedBox(height: 20),
-              _songPlayer(),
-            ],
+          child: BlocBuilder<SongPlayerCubit, SongPlayerState>(
+            builder: (context, state) {
+              final cubit = context.read<SongPlayerCubit>();
+              final currentSong = cubit.currentSong ?? song;
+
+              return Column(
+                children: [
+                  _songCover(currentSong, context),
+                  SizedBox(height: 17),
+                  _songDetails(currentSong),
+                  SizedBox(height: 20),
+                  _songPlayer(),
+                ],
+              );
+            },
           ),
         ),
       ),
@@ -68,21 +86,25 @@ class SongPlayerPage extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              song.title,
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 4),
-            Text(
-              song.artist,
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-            ),
-          ],
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                song.title,
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+              ),
+              SizedBox(height: 4),
+              Text(
+                song.artist,
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
         ),
-        FavouriteButton(songEntity: song, size: 35)
+        FavouriteButton(songEntity: song, size: 35),
       ],
     );
   }
@@ -91,70 +113,161 @@ class SongPlayerPage extends StatelessWidget {
     return BlocBuilder<SongPlayerCubit, SongPlayerState>(
       builder: (context, state) {
         if (state is SongPlayerLoaded) {
+          final cubit = context.read<SongPlayerCubit>();
+
           return Column(
             children: [
+              // Progress Slider
               Slider(
                 activeColor: AppColors.primary,
-                value:
-                    context
-                        .read<SongPlayerCubit>()
-                        .songPosition
-                        .inSeconds
-                        .toDouble(),
+                value: cubit.songPosition.inSeconds.toDouble(),
                 min: 0.0,
-                max:
-                    context
-                        .read<SongPlayerCubit>()
-                        .songDuration
-                        .inSeconds
-                        .toDouble(),
+                max: cubit.songDuration.inSeconds.toDouble(),
                 onChanged: (value) {
-                  context.read<SongPlayerCubit>().updateSeekPosition(
-                    Duration(seconds: value.toInt()),
-                  );
+                  cubit.updateSeekPosition(Duration(seconds: value.toInt()));
                 },
                 onChangeEnd: (value) {
-                  context.read<SongPlayerCubit>().seekTo(
-                    Duration(seconds: value.toInt()),
-                  );
+                  cubit.seekTo(Duration(seconds: value.toInt()));
                 },
               ),
 
+              // Time Display
               SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    formatDuration(
-                      context.read<SongPlayerCubit>().songPosition,
+                  Text(formatDuration(cubit.songPosition)),
+                  Text(formatDuration(cubit.songDuration)),
+                ],
+              ),
+
+              // Control Buttons Row
+              SizedBox(height: 30),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  // Shuffle Button
+                  GestureDetector(
+                    onTap: () => cubit.toggleShuffle(),
+                    child: Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color:
+                            cubit.isShuffleEnabled
+                                ? AppColors.primary.withOpacity(0.2)
+                                : Colors.transparent,
+                      ),
+                      child: Icon(
+                        Icons.shuffle,
+                        size: 24,
+                        color:
+                            cubit.isShuffleEnabled
+                                ? AppColors.primary
+                                : Colors.grey,
+                      ),
                     ),
                   ),
-                  Text(
-                    formatDuration(
-                      context.read<SongPlayerCubit>().songDuration,
+
+                  // Previous Button
+                  GestureDetector(
+                    onTap:
+                        cubit.playlist.isNotEmpty
+                            ? () => cubit.playPreviousSong()
+                            : null,
+                    child: Container(
+                      padding: EdgeInsets.all(12),
+                      child: Icon(
+                        Icons.skip_previous_rounded,
+                        size: 32,
+                        color:
+                            cubit.playlist.isNotEmpty
+                                ? Colors.white
+                                : Colors.grey,
+                      ),
+                    ),
+                  ),
+
+                  // Play/Pause Button
+                  GestureDetector(
+                    onTap: () => cubit.playOrPause(),
+                    child: Container(
+                      height: 60,
+                      width: 60,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.primary,
+                      ),
+                      child: Icon(
+                        cubit.audioPlayer.playing
+                            ? Icons.pause
+                            : Icons.play_arrow_rounded,
+                        size: 32,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+
+                  // Next Button
+                  GestureDetector(
+                    onTap:
+                        cubit.playlist.isNotEmpty
+                            ? () => cubit.playNextSong()
+                            : null,
+                    child: Container(
+                      padding: EdgeInsets.all(12),
+                      child: Icon(
+                        Icons.skip_next_rounded,
+                        size: 32,
+                        color:
+                            cubit.playlist.isNotEmpty
+                                ? Colors.white
+                                : Colors.grey,
+                      ),
+                    ),
+                  ),
+
+                  // Repeat Button
+                  GestureDetector(
+                    onTap: () => cubit.toggleRepeat(),
+                    child: Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color:
+                            cubit.repeatMode != LoopMode.off
+                                ? AppColors.primary.withOpacity(0.2)
+                                : Colors.transparent,
+                      ),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Icon(
+                            cubit.repeatMode == LoopMode.one
+                                ? Icons.repeat_one
+                                : Icons.repeat,
+                            size: 24,
+                            color:
+                                cubit.repeatMode != LoopMode.off
+                                    ? AppColors.primary
+                                    : Colors.grey,
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 20),
-              GestureDetector(
-                onTap: () {
-                  context.read<SongPlayerCubit>().playOrPause();
-                },
-                child: Container(
-                  height: 60,
-                  width: 60,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.primary,
-                  ),
-                  child: Icon(
-                    context.read<SongPlayerCubit>().audioPlayer.playing
-                        ? Icons.pause
-                        : Icons.play_arrow_rounded,
+
+              // Optional: Display current playlist info
+              if (cubit.playlist.isNotEmpty)
+                Padding(
+                  padding: EdgeInsets.only(top: 20),
+                  child: Text(
+                    "${cubit.currentSongIndex + 1} of ${cubit.playlist.length}",
+                    style: TextStyle(color: Colors.grey, fontSize: 14),
                   ),
                 ),
-              ),
             ],
           );
         }

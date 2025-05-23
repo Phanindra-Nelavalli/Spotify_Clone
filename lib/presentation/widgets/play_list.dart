@@ -68,7 +68,11 @@ class PlayList extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (BuildContext context) => SongPlayerPage(song: song),
+                builder: (BuildContext context) => SongPlayerPage(
+                  song: song,
+                  playlist: songs,  // Pass the complete playlist
+                  initialIndex: index,  // Pass the selected song's index
+                ),
               ),
             );
           },
@@ -128,7 +132,7 @@ class PlayList extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 20),
-                  FavouriteButton(songEntity: song,size: 25,),
+                  FavouriteButton(songEntity: song, size: 25),
                 ],
               ),
             ],

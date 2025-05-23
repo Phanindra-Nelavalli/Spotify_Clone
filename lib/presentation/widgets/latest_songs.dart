@@ -45,7 +45,12 @@ class LatestSongs extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (BuildContext context) => SongPlayerPage(song: song),
+                builder:
+                    (BuildContext context) => SongPlayerPage(
+                      song: song,
+                      playlist: songs,
+                      initialIndex: index,
+                    ),
               ),
             );
           },
