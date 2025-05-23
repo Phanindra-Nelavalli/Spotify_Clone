@@ -80,7 +80,7 @@ class LatestSongs extends StatelessWidget {
                         color:
                             context.isDarkMode
                                 ? AppColors.darkGrey
-                                : Color(0xffe6e6e6e),
+                                : Color.fromARGB(253, 198, 194, 194),
                       ),
                       child: Icon(
                         Icons.play_arrow_rounded,
