@@ -58,9 +58,7 @@ class _HomePageState extends State<HomePage>
                     padding: EdgeInsets.only(left: 25),
                     child: LatestSongs(),
                   ),
-                  Container(),
-                  Container(),
-                  Container(),
+                 
                 ],
               ),
             ),
@@ -110,18 +108,18 @@ class _HomePageState extends State<HomePage>
           'Latest',
           style: TextStyle(fontWeight: FontWeight.w500, fontSize: 24),
         ),
-        Text(
-          'Video',
-          style: TextStyle(fontWeight: FontWeight.w500, fontSize: 24),
-        ),
-        Text(
-          'Artist',
-          style: TextStyle(fontWeight: FontWeight.w500, fontSize: 24),
-        ),
-        Text(
-          'Podcast',
-          style: TextStyle(fontWeight: FontWeight.w500, fontSize: 24),
-        ),
+        // Text(
+        //   'Video',
+        //   style: TextStyle(fontWeight: FontWeight.w500, fontSize: 24),
+        // ),
+        // Text(
+        //   'Artist',
+        //   style: TextStyle(fontWeight: FontWeight.w500, fontSize: 24),
+        // ),
+        // Text(
+        //   'Podcast',
+        //   style: TextStyle(fontWeight: FontWeight.w500, fontSize: 24),
+        // ),
       ],
     );
   }
