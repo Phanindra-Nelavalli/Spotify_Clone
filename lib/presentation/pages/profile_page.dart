@@ -11,7 +11,10 @@ import 'package:spotify/presentation/bloc/favourite_song_cubit.dart';
 import 'package:spotify/presentation/bloc/favourite_song_state.dart';
 import 'package:spotify/presentation/bloc/profile_info_cubit.dart';
 import 'package:spotify/presentation/bloc/profile_info_state.dart';
+import 'package:spotify/presentation/bloc/theme_cubit.dart';
+import 'package:spotify/presentation/pages/sign_in_page.dart';
 import 'package:spotify/presentation/pages/song_player_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -26,10 +29,48 @@ class ProfilePage extends StatelessWidget {
             "Profile",
             style: TextStyle(fontSize: 21, fontWeight: FontWeight.bold),
           ),
-          backgroundColor: const Color(0xff2C2B2B),
-          action: IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.more_vert_rounded, size: 29),
+          backgroundColor:
+              context.isDarkMode ? const Color(0xff2C2B2B) : Colors.white,
+          action: Row(
+            children: [
+              IconButton(
+                onPressed: () {
+                  !context.isDarkMode
+                      ? context.read<ThemeCubit>().updateTheme(ThemeMode.dark)
+                      : context.read<ThemeCubit>().updateTheme(ThemeMode.light);
+                },
+                icon: Icon(
+                  !context.isDarkMode
+                      ? Icons.light_mode_outlined
+                      : Icons.dark_mode_outlined,
+                  size: 29,
+                ),
+              ),
+              PopupMenuButton<String>(
+                icon: const Icon(Icons.more_vert_rounded, size: 29),
+                onSelected: (String value) {
+                  if (value == 'logout') {
+                    _showLogoutDialog(context);
+                  }
+                },
+                itemBuilder:
+                    (BuildContext context) => [
+                      PopupMenuItem<String>(
+                        value: 'logout',
+                        child: Row(
+                          children: [
+                            Icon(Icons.logout, color: Colors.red, size: 20),
+                            SizedBox(width: 12),
+                            Text(
+                              'Logout',
+                              style: TextStyle(color: Colors.red, fontSize: 16),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+              ),
+            ],
           ),
         ),
         body: SingleChildScrollView(
@@ -43,6 +84,142 @@ class ProfilePage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor:
+              context.isDarkMode ? const Color(0xff2C2B2B) : Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Text(
+            'Logout',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: context.isDarkMode ? Colors.white : Colors.black,
+            ),
+          ),
+          content: Text(
+            'Are you sure you want to logout?',
+            style: TextStyle(
+              fontSize: 16,
+              color: context.isDarkMode ? Colors.grey[300] : Colors.grey[700],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close dialog
+              },
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  color:
+                      context.isDarkMode ? Colors.grey[400] : Colors.grey[600],
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop(); // Close dialog first
+                await _performLogout(context);
+              },
+              child: Text(
+                'Logout',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _performLogout(BuildContext context) async {
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Center(
+            child: Container(
+              padding: EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color:
+                    context.isDarkMode ? const Color(0xff2C2B2B) : Colors.white,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(color: AppColors.primary),
+                  SizedBox(height: 16),
+                  Text(
+                    'Logging out...',
+                    style: TextStyle(
+                      color: context.isDarkMode ? Colors.white : Colors.black,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+
+      // Sign out from Firebase
+      await FirebaseAuth.instance.signOut();
+
+      // Close loading dialog
+      Navigator.of(context).pop();
+
+      // Navigate to sign in page and clear all previous routes
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (BuildContext context) => SignInPage()),
+        (route) => false,
+      );
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Logged out successfully',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: AppColors.primary,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      // Close loading dialog if it's still open
+      Navigator.of(context).pop();
+
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Failed to logout. Please try again.',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+        ),
+      );
+
+      print('Logout error: $e');
+    }
   }
 
   Widget _profileInfo(BuildContext context) {
@@ -91,7 +268,7 @@ class ProfilePage extends StatelessWidget {
             );
           }
           if (state is ProfileInfoLoadingfailure) {
-            return const Center(child: Text("Please try again rlater"));
+            return const Center(child: Text("Please try again later"));
           }
           return const SizedBox.shrink();
         },
